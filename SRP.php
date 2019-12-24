@@ -30,10 +30,10 @@ class DesignPatternTest extends TestCase
 
 abstract class FilterSalesRepo{
     public $repo;
-    public function greaterThan($data)
+    public function greaterThan($price, $sales)
     {
-        return array_filter($this->getSales(), function ($item) use ($data){
-            return $item['price'] >= $data;
+        return array_filter($sales, function ($item) use ($price){
+            return $item['price'] >= $price;
         });
     }
 }
@@ -59,14 +59,16 @@ class DBSalesRepository extends FilterSalesRepo implements SalesRepository {
 }
 class SalesReporter{
     public $repo;
+    public $salesData;
     public function __construct(FilterSalesRepo $repository)
     {
         $this->repo = $repository;
+        $this->salesData = $this->repo->getSales();
     }
 
 
     public function greaterThan($price, SalesFormatter $formatter){
-        $data = $this->repo->greaterThan($price);
+        $data = $this->repo->greaterThan($price, $this->salesData);
         return $formatter->format($data);
 
     }
